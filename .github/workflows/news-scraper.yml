@@ -1,0 +1,42 @@
+name: Test News Scraper Every 2 Minutes
+
+on:
+  schedule:
+    - cron: "*/2 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    env:
+      SEARCH_QUERY: "AI Automations"
+      LANGUAGE: "en"
+      SHEET_NAME: "sheet1"
+      CREDENTIAL_FILE: "credentials.json"
+
+      NEWS_DATA_API: ${{ secrets.NEWS_DATA_API }}
+      SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create credentials.json from secret
+        run: |
+          echo "$GOOGLE_CREDENTIALS" > credentials.json
+
+      - name: Run Script
+        run: |
+          python app.py
